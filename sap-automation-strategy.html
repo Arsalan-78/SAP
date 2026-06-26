@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAP Automation Strategy — n8n & The Field</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0B1220;
+  --surface:#121B2E;
+  --surface-2:#182338;
+  --line:#27344B;
+  --line-soft:#1C2740;
+  --text:#EBEEF5;
+  --text-muted:#92A0B8;
+  --text-dim:#5E6E89;
+  --blue:#4F8EF7;
+  --blue-dim:#2C4A82;
+  --amber:#E0954A;
+  --amber-dim:#4A3A22;
+  --green:#5FB58A;
+  --green-dim:#1F3D33;
+  --red:#D9684E;
+  --red-dim:#4A2820;
+  --display:'Space Grotesk',sans-serif;
+  --body:'IBM Plex Sans',sans-serif;
+  --mono:'IBM Plex Mono',monospace;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html{scroll-snap-type:y proximity; scroll-behavior:smooth;}
+@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{transition:none !important; animation:none !important;} }
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--body);
+  line-height:1.55;
+  background-image:
+    linear-gradient(var(--line-soft) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+  background-size:48px 48px;
+  background-attachment:fixed;
+}
+h1,h2,h3{font-family:var(--display); font-weight:600; letter-spacing:-0.01em;}
+.mono{font-family:var(--mono);}
+a{color:var(--blue);}
+
+/* ===== Chrome: progress + nav ===== */
+.progress{position:fixed; top:0; left:0; height:3px; background:linear-gradient(90deg,var(--blue),var(--green)); z-index:50; width:0%;}
+.dotnav{position:fixed; left:22px; top:50%; transform:translateY(-50%); z-index:50; display:flex; flex-direction:column; gap:10px;}
+.dotnav a{display:block; width:7px; height:7px; border-radius:50%; background:var(--line); border:1px solid var(--text-dim); transition:.25s;}
+.dotnav a.active{background:var(--blue); border-color:var(--blue); transform:scale(1.5);}
+@media (max-width:860px){ .dotnav{display:none;} }
+
+.counter{position:fixed; right:24px; bottom:20px; z-index:50; font-family:var(--mono); font-size:.72rem; color:var(--text-dim); letter-spacing:.06em; background:rgba(11,18,32,.7); padding:6px 10px; border:1px solid var(--line); border-radius:20px; backdrop-filter:blur(4px);}
+.counter b{color:var(--text);}
+
+/* ===== Slide shell ===== */
+.slide{
+  min-height:100vh;
+  width:100%;
+  padding:clamp(2.2rem,6vw,5.5rem) clamp(1.4rem,7vw,6rem);
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  position:relative;
+  border-bottom:1px solid var(--line-soft);
+  scroll-snap-align:start;
+}
+.slide-inner{max-width:1180px; width:100%; margin:0 auto;}
+.eyebrow{
+  font-family:var(--mono); font-size:.72rem; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--blue); display:flex; align-items:center; gap:10px; margin-bottom:1.1rem;
+}
+.eyebrow .num{color:var(--text-dim);}
+.eyebrow::before{content:""; width:18px; height:1px; background:var(--blue);}
+h2.slide-title{font-size:clamp(1.7rem,3.4vw,2.7rem); margin-bottom:.5rem; line-height:1.08;}
+.lede{color:var(--text-muted); font-size:clamp(1rem,1.4vw,1.18rem); max-width:46em; margin-bottom:1.4rem;}
+.kicker{color:var(--text-dim); font-size:.92rem; max-width:50em;}
+
+/* ===== Cards / grids ===== */
+.grid{display:grid; gap:1rem;}
+.grid-2{grid-template-columns:repeat(2,1fr);}
+.grid-3{grid-template-columns:repeat(3,1fr);}
+.grid-4{grid-template-columns:repeat(4,1fr);}
+@media (max-width:900px){ .grid-2,.grid-3,.grid-4{grid-template-columns:1fr;} }
+
+.card{
+  background:var(--surface); border:1px solid var(--line); border-radius:10px;
+  padding:1.3rem 1.4rem;
+}
+.card h4{font-family:var(--display); font-size:1.02rem; margin-bottom:.5rem; color:var(--text);}
+.card p{color:var(--text-muted); font-size:.92rem;}
+.card .tag{font-family:var(--mono); font-size:.66rem; text-transform:uppercase; letter-spacing:.1em; padding:3px 8px; border-radius:20px; display:inline-block; margin-bottom:.7rem;}
+.tag-blue{background:var(--blue-dim); color:#BBD3FF;}
+.tag-amber{background:var(--amber-dim); color:#F4C089;}
+.tag-green{background:var(--green-dim); color:#A9E0C4;}
+.tag-red{background:var(--red-dim); color:#F2A893;}
+
+.stat{font-family:var(--display); font-size:clamp(1.6rem,3vw,2.3rem); color:var(--blue); line-height:1;}
+.stat-label{font-family:var(--mono); font-size:.74rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:.08em; margin-top:.35rem;}
+
+/* ===== Tables ===== */
+table{width:100%; border-collapse:collapse; font-size:.88rem;}
+th,td{padding:.65rem .8rem; border-bottom:1px solid var(--line); text-align:left; vertical-align:top;}
+th{font-family:var(--mono); font-size:.68rem; text-transform:uppercase; letter-spacing:.08em; color:var(--text-dim); font-weight:500;}
+td{color:var(--text-muted);}
+td strong, td b{color:var(--text); font-weight:600;}
+tr:last-child td{border-bottom:none;}
+.table-wrap{overflow-x:auto; border:1px solid var(--line); border-radius:10px; background:var(--surface);}
+.table-wrap table{min-width:680px;}
+.table-wrap th:first-child, .table-wrap td:first-child{padding-left:1.2rem;}
+
+.pill{display:inline-block; font-family:var(--mono); font-size:.66rem; padding:2px 8px; border-radius:20px; text-transform:uppercase; letter-spacing:.06em;}
+.pill-go{background:var(--green-dim); color:#A9E0C4;}
+.pill-caution{background:var(--amber-dim); color:#F4C089;}
+.pill-stop{background:var(--red-dim); color:#F2A893;}
+
+/* ===== Hero ===== */
+.hero{justify-content:center;}
+.hero-top{font-family:var(--mono); font-size:.78rem; letter-spacing:.16em; text-transform:uppercase; color:var(--text-dim); margin-bottom:1.6rem;}
+.hero h1{font-size:clamp(2.4rem,6.4vw,4.6rem); line-height:1.02; max-width:14ch;}
+.hero h1 .accent{color:var(--blue);}
+.hero .sub{margin-top:1.4rem; font-size:clamp(1.02rem,1.6vw,1.28rem); color:var(--text-muted); max-width:42em;}
+.hero-meta{display:flex; gap:2.2rem; margin-top:2.6rem; flex-wrap:wrap;}
+.hero-meta div{font-family:var(--mono); font-size:.74rem; color:var(--text-dim);}
+.hero-meta div b{display:block; color:var(--text); font-size:.92rem; font-family:var(--body); font-weight:600; margin-top:2px;}
+.hero-diagram{margin-top:2.4rem;}
+
+/* ===== Wire diagram SVG common ===== */
+.wire-node rect{fill:var(--surface-2); stroke:var(--line); stroke-width:1;}
+.wire-node text{fill:var(--text); font-family:var(--mono); font-size:11px;}
+.wire-node .sub{fill:var(--text-dim); font-size:9px;}
+.wire-path{fill:none; stroke:var(--text-dim); stroke-width:1.4;}
+.wire-path.live{stroke:var(--blue);}
+.wire-path.warn{stroke:var(--amber); stroke-dasharray:5 4;}
+.wire-path.dead{stroke:var(--red); stroke-dasharray:2 4; opacity:.7;}
+.wire-dot{fill:var(--blue);}
+.wire-label{fill:var(--text-dim); font-family:var(--mono); font-size:9.5px; text-transform:uppercase; letter-spacing:.04em;}
+.wire-label.warn{fill:var(--amber);}
+.wire-label.dead{fill:var(--red);}
+
+/* ===== Callouts ===== */
+.callout{border-radius:10px; padding:1.1rem 1.3rem; border:1px solid var(--line); display:flex; gap:.9rem; align-items:flex-start;}
+.callout-amber{background:linear-gradient(180deg,var(--amber-dim),transparent); border-color:#5a4427;}
+.callout-red{background:linear-gradient(180deg,var(--red-dim),transparent); border-color:#5a3024;}
+.callout-green{background:linear-gradient(180deg,var(--green-dim),transparent); border-color:#274639;}
+.callout-blue{background:linear-gradient(180deg,var(--blue-dim),transparent); border-color:#2c4a82;}
+.callout .mark{font-family:var(--display); font-size:1.3rem; flex-shrink:0;}
+.callout p{color:var(--text-muted); font-size:.92rem;}
+.callout strong{color:var(--text);}
+
+/* ===== Timeline ===== */
+.tl{border-left:2px solid var(--line); padding-left:1.4rem; display:flex; flex-direction:column; gap:1.05rem;}
+.tl-item{position:relative;}
+.tl-item::before{content:""; position:absolute; left:-1.62rem; top:.32rem; width:9px; height:9px; border-radius:50%; background:var(--bg); border:2px solid var(--red);}
+.tl-item.ok::before{border-color:var(--green);}
+.tl-item .date{font-family:var(--mono); font-size:.7rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:.06em;}
+.tl-item .title{font-weight:600; margin:.15rem 0; font-size:.96rem;}
+.tl-item .title .cve{color:var(--red); font-family:var(--mono); font-size:.78rem; margin-left:.4rem;}
+.tl-item p{color:var(--text-muted); font-size:.86rem;}
+
+/* ===== two-col layout ===== */
+.cols{display:grid; grid-template-columns:1.05fr .95fr; gap:2.4rem; align-items:start;}
+@media (max-width:900px){ .cols{grid-template-columns:1fr;} }
+
+footer.slide{min-height:auto; padding-top:3rem; padding-bottom:3rem;}
+.sources{font-size:.78rem; color:var(--text-dim); line-height:1.8; columns:2; column-gap:2.5rem;}
+@media (max-width:760px){ .sources{columns:1;} }
+
+.bigword{font-family:var(--display); font-weight:700; font-size:clamp(1.3rem,2.2vw,1.7rem);}
+.divider{height:1px; background:var(--line); margin:1.6rem 0;}
+ul.plain{list-style:none; display:flex; flex-direction:column; gap:.55rem;}
+ul.plain li{padding-left:1.3rem; position:relative; color:var(--text-muted); font-size:.92rem;}
+ul.plain li::before{content:"—"; position:absolute; left:0; color:var(--text-dim);}
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+<div class="counter mono"><b id="curnum">01</b> / 13</div>
+<nav class="dotnav" id="dotnav"></nav>
+
+<!-- 01 — COVER -->
+<section class="slide hero" id="s1">
+  <div class="slide-inner">
+    <div class="hero-top">Research brief · Morphelabs Automation Practice</div>
+    <h1>Automating SAP<br>without<span class="accent"> compromising</span> anything.</h1>
+    <p class="sub">A grounded look at what's actually possible to automate inside SAP, whether n8n is the right engine for it, whether a VPS is the right place to run that engine — and what the field of competing tools looks like once you stop trusting the marketing pages.</p>
+    <div class="hero-meta">
+      <div>Prepared<b>June 2026</b></div>
+      <div>Scope<b>n8n · SAP Joule · SAP interfaces · Hosting · 8 alternative platforms</b></div>
+      <div>Verdict<b>Conditional yes — with two non‑negotiables</b></div>
+    </div>
+  </div>
+</section>
+
+<!-- 02 — THE BRIEF -->
+<section class="slide" id="s2">
+  <div class="slide-inner">
+    <div class="eyebrow"><span class="num">02</span> The brief</div>
+    <h2 class="slide-title">Three questions, answered honestly</h2>
+    <p class="lede">Not "can n8n touch SAP" — yes, trivially. The real questions are sharper than that, and they're the ones that decide whether this becomes a clean win or a liability six months in.</p>
+    <div class="grid grid-3">
+      <div class="card">
+        <span class="tag tag-blue">Question 1</span>
+        <h4>What can actually be automated?</h4>
+        <p>Not in theory — which SAP processes have proven ROI, what they cost to automate, and where the ceiling is.</p>
+      </div>
+      <div class="card">
+        <span class="tag tag-blue">Question 2</span>
+        <h4>Is n8n the right engine, or one of several?</h4>
+        <p>n8n just had the biggest validation event in its history. That changes the analysis — but doesn't end it.</p>
+      </div>
+      <div class="card">
+        <span class="tag tag-blue">Question 3</span>
+        <h4>VPS, n8n Cloud, or something else entirely?</h4>
+        <p>This is where most automation shops cut a corner without realizing it. We didn't want to do that here.</p>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <p class="kicker">Method: cross-checked n8n's own documentation and release notes, SAP's licensing and interface guidance, CVE/NVD disclosures, and independent comparisons of Make, Workato, Boomi, MuleSoft, UiPath, Power Automate and SAP's native automation stack. Where sources disagreed, we flagged it rather than picked the convenient number.</p>
+  </div>
+</section>
+
+<!-- 03 — HEADLINE FINDING -->
+<section class="slide" id="s3">
+  <div class="slide-inner">
+    <div class="eyebrow"><span class="num">03</span> Headline finding</div>
+    <h2 class="slide-title">SAP didn't just tolerate n8n. SAP bought into it.</h2>
+    <p class="lede">In May 2026, SAP took a minority stake in n8n at a <b style="color:var(--text)">$5.2B valuation</b> — more than double its valuation ten months earlier — and signed a multi‑year partnership to embed n8n natively inside <b style="color:var(--text)">Joule Studio</b>, SAP's agent‑building environment on the Business AI Platform.</p>
+    <div class="grid grid-4" style="margin-top:1.4rem;">
+      <div class="card"><div class="stat">$5.2B</div><div class="stat-label">n8n valuation at the SAP deal</div></div>
+      <div class="card"><div class="stat">Q3 2026</div><div class="stat-label">Targeted GA inside Joule Studio</div></div>
+      <div class="card"><div class="stat">1.7M+</div><div class="stat-label">n8n developer community</div></div>
+      <div class="card"><div class="stat">1,400</div><div class="stat-label">n8n enterprise customers reported</div></div>
+    </div>
+    <div class="divider"></div>
+    <div class="cols">
+      <div>
+        <h4 style="margin-bottom:.5rem;">What this means in practice — eventually</h4>
+        <ul class="plain">
+          <li>n8n runs inside SAP BTP itself: SAP's identity, access control and governance wrap around it, instead of you building that perimeter yourself.</li>
+          <li>It draws on existing BTP credits — no separate vendor contract for the orchestration layer.</li>
+          <li>SAP-specific nodes for n8n are explicitly still "on the roadmap," not shipped. Teams hoping to lift-and-shift existing Integration Suite workloads need to wait for those nodes.</li>
+        </ul>
+      </div>
+      <div class="callout callout-amber">
+        <div class="mark">!</div>
+        <p><strong>Why this doesn't end the discussion:</strong> GA is targeted for Q3 2026 — it isn't live yet. Today, connecting n8n to SAP still means HTTP/OAuth2 calls, OData services, or third‑party connectors. Everything from here treats that as the present reality, with the Joule Studio integration as a real but future consideration in the recommendation.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 04 — SAP'S OWN ANSWER: JOULE -->
+<section class="slide" id="s4">
+  <div class="slide-inner">
+    <div class="eyebrow"><span class="num">04</span> SAP's own answer</div>
+    <h2 class="slide-title">Before any third-party tool: what Joule already does</h2>
+    <p class="lede">Any automation pitch into a SAP shop has to reckon with Joule first. It's SAP's native AI layer, it's free at the base tier, and as of May 2026 it's the same SAP that just bought into n8n — so the two are converging, not competing, inside Joule Studio.</p>
+    <div class="grid grid-4" style="margin-top:1.2rem;">
+      <div class="card"><div class="stat">40+</div><div class="stat-label">Joule Agents shipped, spanning finance, HR, procurement, supply chain</div></div>
+      <div class="card"><div class="stat">2,400+</div><div class="stat-label">Joule Skills available, up from a handful 18 months ago</div></div>
+      <div class="card"><div class="stat">75%</div><div class="stat-label">Cited reduction in time spent on multi-step workflows via Joule Assistants*</div></div>
+      <div class="card"><div class="stat">Free→2026</div><div class="stat-label">Joule Studio design-time access free for SAP customers/partners through end of 2026</div></div>
+    </div>
+    <div class="divider"></div>
+    <div class="cols">
+      <div>
+        <h4 style="margin-bottom:.5rem;">What Joule actually is, in 2026</h4>
+        <ul class="plain">
+          <li><b style="color:var(--text)">Joule Base</b> — navigational, informational and simple-automation skills, bundled free into every SAP cloud subscription. No AI Units needed.</li>
+          <li><b style="color:var(--text)">Joule Premium / Joule Agents</b> — autonomous, multi-step agents (Cash Management, Bid Analysis, Production Planning, Dispute Resolution, Tender Analysis and more) that reason, plan and act, not just answer questions. Billed in AI Units.</li>
+          <li><b style="color:var(--text)">Joule Assistants</b> — role-aware "teammates" (finance, HR, procurement) that pick the right agent for the task automatically, so the user never has to know which agent to invoke.</li>
+          <li><b style="color:var(--text)">Joule Studio</b> — the agent builder: natural-language-to-agent generation, LangChain/AutoGen/LlamaIndex support, and — since May 2026 — a fully managed n8n environment embedded directly inside it.</li>
+        </ul>
+      </div>
+      <div class="callout callout-blue">
+        <div class="mark">⊙</div>
+        <p><strong>Why this changes the pitch, not kills it:</strong> Joule Agents are genuinely strong where the task needs SAP's own business-process knowledge and live data grounding (cash reconciliation, bid comparison, e-invoicing). They're a weaker fit for cross-platform orchestration outside SAP, custom computer-vision pipelines, or anything the client wants fully self-hosted and vendor-independent — which is exactly where n8n still wins. The honest pitch is "Joule for what's native to SAP, n8n for everything that spans beyond it," not "n8n vs. Joule."</p>
+      </div>
+    </div>
+    <p class="kicker" style="margin-top:1.1rem;">*Reduction figures are SAP's own published claims for specific Joule Assistant deployments — useful as a directional benchmark, not a guarantee for any given client's process maturity.</p>
+  </div>
+</section>
+
+<!-- 05 — WHAT CAN BE AUTOMATED -->
+<section class="slide" id="s5">
+  <div class="slide-inner">
+    <div class="eyebrow"><span class="num">05</span> The use case map</div>
+    <h2 class="slide-title">What "automate SAP" actually means</h2>
+    <p class="lede">The proven, recurring automation targets across SAP-running companies — ranked by how mechanical and rules-based the process is, which is the real predictor of automation success.</p>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Process</th><th>What gets automated</th><th>Typical signal</th><th>Fit</th></tr>
+        <tr><td><strong>Invoice processing (AP)</strong></td><td>Capture from email/PDF/EDI, OCR extraction, 3‑way match against PO and goods receipt, exception routing, posting.</td><td>Industry benchmarks cite $2–5/invoice automated vs $12–30 manual, and 1–3 day vs 5–15 day turnaround.</td><td><span class="pill pill-go">Strong fit</span></td></tr>
+        <tr><td><strong>PO / sales order creation</strong></td><td>Convert incoming orders (Excel, PDF, email, EDI) into structured SAP sales/purchase orders.</td><td>Cited as ~10 minutes of manual work per order at scale — a high-volume, low-judgment task.</td><td><span class="pill pill-go">Strong fit</span></td></tr>
+        <tr><td><strong>Vendor / master data maintenance</strong></td><td>Create, validate and sync vendor, material and customer master records across systems.</td><td>Frequently the largest hidden labor sink — category managers doing data entry instead of category work.</td><td><span class="pill pill-go">Strong fit</span></td></tr>
+        <tr><td><strong>Supplier onboarding</strong></td><td>Document collection, validation, master data creation, approval routing for new vendors.</td><td>High time-reduction potential; relatively self-contained workflow.</td><td><span class="pill pill-go">Strong fit</span></td></tr>
+        <tr><td><strong>Reporting, alerts & notifications</strong></td><td>Scheduled extracts, threshold alerts, Slack/Teams/email notifications driven by SAP data changes.</td><td>Read-only by nature — the lowest-risk automation category, see slide 06.</td><td><span class="pill pill-go">Strong fit</span></td></tr>
+        <tr><td><strong>Approval workflows / exception handling</strong></td><td>Route flagged invoices, blocked POs or mismatches to the right human, with escalation timers.</td><td>Pairs naturally with n8n's branching and wait/escalate logic.</td><td><span class="pill pill-go">Strong fit</span></td></tr>
+        <tr><td><strong>Employee/HR transactions (SuccessFactors)</strong></td><td>Onboarding triggers, leave requests, org-data sync to/from other HR tools.</td><td>Well-trodden via official connectors (Make, Workato both ship SuccessFactors modules).</td><td><span class="pill pill-caution">Good fit, check connector</span></td></tr>
+        <tr><td><strong>Legacy screen-level tasks (old SAP GUI)</strong></td><td>Steps with no API at all — only a transaction screen to click through.</td><td>This is RPA's job, not a workflow tool's. Forcing it onto n8n usually means a fragile UI-scraping custom node.</td><td><span class="pill pill-stop">Wrong tool — use RPA</span></td></tr>
+      </table>
+    </div>
+    <p class="kicker" style="margin-top:1rem;">Figures above are industry benchmarks reported by automation vendors and SAP partners — treat them as a planning range, not a promise. The actual number for any specific client needs a baseline measurement before a deal is priced on it.</p>
+  </div>
+</section>
+
+<!-- 06 — HOW YOU TALK TO SAP -->
+<section class="slide" id="s6">
+  <div class="slide-inner">
+    <div class="eyebrow"><span class="num">06</span> The technical layer</div>
+    <h2 class="slide-title">How you actually connect to SAP</h2>
+    <p class="lede">This is the part most automation pitches skip, and the part that determines whether an integration is safe, supported, and legal. Four real paths exist — they are not interchangeable.</p>
+
+    <svg viewBox="0 0 1100 230" style="width:100%; height:auto; margin:1.2rem 0;">
+      <defs>
+        <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="var(--text-dim)"/></marker>
+      </defs>
+      <g class="wire-node"><rect x="20" y="95" width="150" height="44" rx="8"/><text x="95" y="120" text-anchor="middle">SAP S/4HANA</text></g>
+
+      <path class="wire-path live" d="M170,108 C260,75 340,75 430,100" marker-end="url(#arrow)"/>
+      <text class="wire-label" x="220" y="72">OData V4 / CDS views</text>
+      <g class="wire-node"><rect x="430" y="80" width="170" height="42" rx="8"/><text x="515" y="105" text-anchor="middle">Recommended path</text></g>
+
+      <path class="wire-path live" d="M170,118 C260,140 340,150 430,150" marker-end="url(#arrow)"/>
+      <text class="wire-label" x="220" y="166">IDoc (async, batch)</text>
+      <g class="wire-node"><rect x="430" y="129" width="170" height="42" rx="8"/><text x="515" y="154" text-anchor="middle">Fine for batch jobs</text></g>
+
+      <path class="wire-path warn" d="M170,130 C260,185 340,195 430,195" marker-end="url(#arrow)"/>
+      <text class="wire-label warn" x="220" y="210">RFC / BAPI (legacy, restricted)</text>
+      <g class="wire-node"><rect x="430" y="174" width="170" height="42" rx="8"/><text x="515" y="199" text-anchor="middle" style="fill:var(--amber)">Needs SAP sign-off</text></g>
+
+      <path class="wire-path dead" d="M170,95 C260,35 340,35 430,55" marker-end="url(#arrow)"/>
+      <text class="wire-label dead" x="220" y="32">Direct DB write</text>
+      <g class="wire-node"><rect x="430" y="34" width="170" height="42" rx="8"/><text x="515" y="59" text-anchor="middle" style="fill:var(--red)">Never supported</text></g>
+
+      <path class="wire-path" d="M600,101 C700,101 700,101 800,101" marker-end="url(#arrow)"/>
+      <g class="wire-node"><rect x="800" y="79" width="160" height="44" rx="8"/><text x="880" y="104" text-anchor="middle">n8n / Make / Workato…</text></g>
+    </svg>
+
+    <div class="grid grid-2">
+      <div class="callout callout-green"><div class="mark">✓</div><p><strong>OData V4 + CDS views</strong> is SAP's own recommended path for both reading and writing today. It's governed, versioned, and what SAP itself is steering the entire ecosystem toward.</p></div>
+      <div class="callout callout-amber"><div class="mark">!</div><p><strong>RFC / BAPI</strong> still works and many connectors (Workato, NeKu.AI) use it — but SAP Note 3255746 explicitly bars using ODP Data Replication RFCs for third-party access, and SAP's CTO stated at Sapphire 2026 that ODP-RFC "was built exclusively for SAP‑to‑SAP transfer," never as an external integration surface.</p></div>
+    </div>
+    <p class="kicker" style="margin-top:1rem;">Direct database access for writes is not a supported integration pattern under any circumstance — it bypasses SAP's business logic, validation and security layer entirely, and breaks on the next upgrade.</p>
+  </div>
+</section>
+
+<!-- 07 — RISK 1: LICENSING -->
+<section class="slide" id="s7">
+  <div class="slide-inner">
+    <div class="eyebrow"><span class="num">07</span> Risk 01 of 02</div>
+    <h2 class="slide-title">The licensing landmine: Digital Access</h2>
+    <p class="lede">This applies no matter which tool you pick — n8n, Make, Workato, UiPath, or SAP's own Integration Suite. Skip it and the automation can quietly become the most expensive thing the client has ever signed.</p>
+    <div class="cols">
+      <div>
+        <h4 style="margin-bottom:.6rem;">The rule, plainly</h4>
+        <p style="color:var(--text-muted); font-size:.92rem; margin-bottom:1rem;">SAP doesn't care which technical method an external system uses. It cares about the <b style="color:var(--text)">outcome</b>: did the integration create or change one of nine licensable SAP document types (sales orders, invoices, material documents, etc.)?</p>
+        <ul class="plain">
+          <li><b style="color:var(--text)">Read-only access</b> (an "indirect static read," with no follow-up transaction) is explicitly free of extra licensing under SAP policy.</li>
+          <li><b style="color:var(--text)">Any write</b> — RFC, BAPI, OData, IDoc, even routed through SAP's own middleware — counts toward Digital Access, regardless of the integration tool.</li>
+          <li>SAP can and does audit this: RFC logs, IDoc logs, and "SAP Passport" markers tag externally-originated documents, and SAP's License Audit team cross-references them against named users.</li>
+        </ul>
+      </div>
+      <div class="callout callout-red">
+        <div class="mark">¤</div>
+        <p><strong>Why this matters for this deal specifically:</strong> automating invoice posting, PO creation or master data writes is exactly the high-ROI work in slide 04 — and exactly the work that triggers Digital Access. The fix isn't avoiding automation. It's pricing the licensing exposure into the proposal before go-live, not discovering it in an audit eighteen months later.</p>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <p class="kicker">Practical move: before any write-workflow goes to production, get (or help the client get) SAP's free Digital Access Evaluation — it counts exactly how many licensable documents the planned automation would generate. That number goes in the proposal, not in the risk register after the fact.</p>
+    <div class="callout callout-amber" style="margin-top:1rem;">
+      <div class="mark">¤</div>
+      <p><strong>A second, separate licensing line if Joule Agents are involved:</strong> Joule Premium and Joule Agents bill on consumption-based AI Units, not Digital Access — typically $0.08–$0.18 per agent action, with SAP not publishing rates up front. Customers who don't model adoption depth see year-two/three overage invoices of $100K–$300K. If the proposal leans on Joule Agents for any part of the automation, model AI Unit burn the same way you model Digital Access exposure — separately, and before go-live.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 08 — RISK 2: SECURITY -->
+<section class="slide" id="s8">
+  <div class="slide-inner">
+    <div class="eyebrow"><span class="num">08</span> Risk 02 of 02</div>
+    <h2 class="slide-title">n8n's 2026 security record — read before you deploy</h2>
+    <p class="lede">This is the data that should directly decide the VPS question. Between November 2025 and March 2026, n8n disclosed a cluster of maximum-severity vulnerabilities — several requiring no credentials at all.</p>
+    <div class="tl">
+      <div class="tl-item"><span class="date">Nov 2025</span><div class="title">CVE-2025-68613 <span class="cve">CVSS 9.9</span></div><p>Authenticated expression-injection RCE. Versions 0.211.0–1.20.4. Became the second link in a later exploit chain.</p></div>
+      <div class="tl-item"><span class="date">Nov 18, 2025</span><div class="title">CVE-2026-21877 <span class="cve">CVSS 9.9–10.0</span></div><p>Arbitrary file write via the Git node, leading to RCE — affecting <b style="color:var(--text)">both self-hosted and n8n Cloud</b>. Patched in 1.121.3.</p></div>
+      <div class="tl-item"><span class="date">Disclosed Jan 7, 2026</span><div class="title">CVE-2026-21858 "Ni8mare" <span class="cve">CVSS 10.0</span></div><p>Unauthenticated RCE via Form/webhook content-type confusion — no login required. Cyera Research estimated 100,000+ self-hosted servers were exposed at disclosure. Patched silently on Nov 18, 2025 in 1.121.0, before the public CVE existed.</p></div>
+      <div class="tl-item"><span class="date">Feb 2026</span><div class="title">CISA flags active exploitation</div><p>Shadowserver counted 24,700+ still-unpatched internet-facing instances — 12,300 in North America, 7,800 in Europe.</p></div>
+      <div class="tl-item ok"><span class="date">Dec 2025 → ongoing</span><div class="title">n8n 2.0 ships "secure by default"</div><p>Task runners now isolate Code-node execution by default; weekly patch cadence continues into June 2026 (current stable: 2.27.x / 1.123.x branch).</p></div>
+    </div>
+    <div class="callout callout-amber" style="margin-top:1.4rem;">
+      <div class="mark">!</div>
+      <p><strong>The takeaway isn't "n8n is unsafe."</strong> It's that n8n is a high-value target precisely because one instance holds the credentials to everything it's connected to — and the fixes were fast, but only for people who patched. The CVEs were disclosed at the platform level, hitting Cloud too. The real variable is exposure and patch discipline, not which hosting model you picked.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 09 — HOSTING DECISION -->
+<section class="slide" id="s9">
+  <div class="slide-inner">
+    <div class="eyebrow"><span class="num">09</span> The hosting question</div>
+    <h2 class="slide-title">VPS, n8n Cloud, managed self-host, or wait?</h2>
+    <p class="lede">Four real options, priced and risk-rated honestly. "VPS" is not one option — a raw, unmanaged VPS and a hardened managed one are two very different risk profiles wearing the same name.</p>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Option</th><th>Cost</th><th>Control</th><th>Who patches it</th><th>Verdict</th></tr>
+        <tr>
+          <td><strong>n8n Cloud</strong></td>
+          <td>$20–60/mo (Starter/Pro), execution-capped; $667+/mo Business; custom Enterprise</td>
+          <td>Low — no SSH, no community nodes, so custom SAP RFC connectors are blocked outright</td>
+          <td>n8n's team, automatically</td>
+          <td><span class="pill pill-caution">Fine for light, non-SAP-write use</span></td>
+        </tr>
+        <tr>
+          <td><strong>Raw, unmanaged VPS</strong></td>
+          <td>$3–7/mo</td>
+          <td>Total — full Docker access, any community node, any port</td>
+          <td><strong style="color:var(--red)">You — and only if someone owns it daily</strong></td>
+          <td><span class="pill pill-stop">The compromise we won't make for write-workflows</span></td>
+        </tr>
+        <tr>
+          <td><strong>Managed self-hosted</strong> (e.g. hardened VPS with reverse proxy, auth, monitored patch cadence)</td>
+          <td>$10–20/mo</td>
+          <td>High — community nodes and custom connectors stay available, with someone accountable for updates</td>
+          <td>A managed provider or your own DevOps, on a committed SLA</td>
+          <td><span class="pill pill-go">Right default for most SAP automation</span></td>
+        </tr>
+        <tr>
+          <td><strong>n8n inside Joule Studio</strong> (SAP BTP — GA targeted Q3 2026)</td>
+          <td>Drawn from existing BTP credits — no new vendor contract</td>
+          <td>Medium — SAP-governed perimeter, fewer raw infrastructure knobs</td>
+          <td>SAP, as part of BTP operations</td>
+          <td><span class="pill pill-go">Best long-term answer if the client already has BTP</span></td>
+        </tr>
+      </table>
+    </div>
+    <div class="divider"></div>
+    <p class="kicker"><b style="color:var(--text)">The actual decision isn't "VPS vs. Cloud."</b> It's "exposed vs. hardened." A $5 VPS with port 5678 open to the internet and nobody watching for CVEs is the single worst combination on this slide — worse than paying more for Cloud, and worse than the managed option two rows up that costs almost the same.</p>
+  </div>
+</section>
+
+<!-- 10 — THE WIDER FIELD -->
+<section class="slide" id="s10">
+  <div class="slide-inner">
+    <div class="eyebrow"><span class="num">10</span> The wider field</div>
+    <h2 class="slide-title">n8n isn't the only tool at this table</h2>
+    <p class="lede">Where each serious alternative actually wins — and where recommending it over n8n would be us being honest, not us hedging.</p>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Platform</th><th>Best for</th><th>SAP angle</th><th>Where it loses to n8n</th></tr>
+        <tr><td><strong>n8n</strong></td><td>Flexible, AI-native automation; technical teams who want full control</td><td>HTTP/OAuth2 + OData today; native SAP nodes + SAP-governed hosting from Q3 2026</td><td>—</td></tr>
+        <tr><td><strong>Make.com</strong></td><td>No-code teams, fastest visual builder, lower technical bar</td><td>Official SAP PartnerEdge member; S/4HANA, ECC, SuccessFactors modules — all gated to the Enterprise plan</td><td>Cloud-only; less control over self-hosting, custom logic, and cost at high volume</td></tr>
+        <tr><td><strong>Workato</strong></td><td>Enterprise governance, IT-led automation at scale</td><td>SAP-certified RFC connector since March 2023 — genuinely production-grade for ECC/S4 on-prem</td><td>Recipe model bottlenecks in IT; weeks-long setup; premium pricing</td></tr>
+        <tr><td><strong>Boomi / MuleSoft</strong></td><td>API-led enterprise integration architecture, not "quick automations"</td><td>Deep hybrid connectivity to legacy + cloud SAP landscapes</td><td>MuleSoft contracts run from hundreds of thousands to millions/year — overkill unless the mandate is enterprise-wide integration, not workflow automation</td></tr>
+        <tr><td><strong>UiPath / Automation Anywhere</strong></td><td>Screen-level automation where no API exists at all</td><td>The only correct tool for legacy SAP GUI steps n8n can't reach</td><td>RPA bots themselves can trigger Digital Access and named-user licensing — not a free pass just because it isn't an API call</td></tr>
+        <tr><td><strong>Microsoft Power Automate</strong></td><td>Clients already deep in Microsoft 365 / Teams / SharePoint</td><td>SAP via Premium connector ($15/user uplift); Power Automate Desktop does free SAP GUI RPA on Windows</td><td>Linear flow builder strains on complex branching logic; weaker outside the Microsoft stack</td></tr>
+        <tr><td><strong>SAP Joule / Joule Studio</strong></td><td>Clients who want the automation owned and governed by SAP itself, with zero external vendor footprint</td><td>Native by definition — 40+ Joule Agents, 2,400+ Skills, grounded in SAP Knowledge Graph and live S/4HANA data; n8n now runs <em>inside</em> Joule Studio rather than beside it</td><td>Opaque, consumption-based AI Unit pricing ($0.08–$0.18/action, $42K–$96K/yr in JCUs typical); weak outside the SAP estate; Joule Agents themselves still need a named owner for prompt/skill governance</td></tr>
+        <tr><td><strong>SAP Build Process Automation / Integration Suite</strong></td><td>Clients who want SAP's own blessing on document-creating automations</td><td>"Clean core" compliant by definition; built-in AI document extraction; lowest audit/governance friction</td><td>Slower to build, BTP-credit cost, steeper learning curve than a visual n8n canvas</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- 11 — DECISION FRAMEWORK -->
+<section class="slide" id="s11">
+  <div class="slide-inner">
+    <div class="eyebrow"><span class="num">11</span> Decision framework</div>
+    <h2 class="slide-title">Five questions before quoting anything</h2>
+    <p class="lede">Run any client's request through this before committing to a platform or a price. Order matters — each question narrows the field.</p>
+    <div class="grid grid-2">
+      <div class="card"><span class="tag tag-blue">01</span><h4>Read, or write?</h4><p>Reporting/alerts → almost anything works, low risk. Document creation/edits → Digital Access and security hardening both become mandatory, not optional.</p></div>
+      <div class="card"><span class="tag tag-blue">02</span><h4>What's the document volume?</h4><p>A few hundred POs a month is a rounding error. Tens of thousands changes the licensing math and may justify SAP's own automation stack instead.</p></div>
+      <div class="card"><span class="tag tag-blue">03</span><h4>S/4HANA edition?</h4><p>Public cloud edition has <b style="color:var(--text)">no RFC at all</b> — OData/REST/SOAP only. On-prem/private edition still has RFC, with the restrictions on slide 05.</p></div>
+      <div class="card"><span class="tag tag-blue">04</span><h4>Does the client already pay for SAP BTP — or already lean on Joule?</h4><p>If they have BTP credits or active Joule Agent adoption, SAP Build Process Automation, native Joule Agents, or n8n-in-Joule-Studio all have a real cost and governance advantage over a separate vendor stack. Ask what Joule already covers before scoping anything new.</p></div>
+      <div class="card"><span class="tag tag-blue">05</span><h4>Who owns patching, day two?</h4><p>No named owner with a 48-hour patch commitment → don't self-host unmanaged. Full stop, regardless of how good the workflow logic is.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 12 — RECOMMENDATION -->
+<section class="slide" id="s12">
+  <div class="slide-inner">
+    <div class="eyebrow"><span class="num">12</span> Recommendation</div>
+    <h2 class="slide-title">The one compromise we refuse to make</h2>
+    <p class="lede">A tiered approach, built around what we found rather than what's easiest to pitch.</p>
+    <div class="grid grid-3">
+      <div class="card"><span class="tag tag-green">Tier 1 — Read-only</span><h4>Reporting, alerts, AI-driven insights</h4><p>n8n, self-hosted on a managed/hardened instance. Cheap, fast, low risk. No Digital Access exposure since nothing is written back.</p></div>
+      <div class="card"><span class="tag tag-amber">Tier 2 — Document creation</span><h4>Invoices, POs, master data writes</h4><p>n8n on a <b style="color:var(--text)">managed, hardened</b> self-host — never a bare exposed VPS — using OData/CDS, not raw RFC, plus a Digital Access cost line in the proposal before go-live.</p></div>
+      <div class="card"><span class="tag tag-blue">Tier 3 — Enterprise mandate</span><h4>Multi-system integration architecture</h4><p>Be straight with the client: that's Workato/Boomi/MuleSoft territory, or SAP's own stack if they're BTP-invested. Don't force n8n into a job it isn't built for.</p></div>
+    </div>
+    <div class="callout callout-blue" style="margin-top:1rem;">
+      <div class="mark">⊙</div>
+      <p><strong>Before any tier is priced, check what Joule already does for free.</strong> If the client's S/4HANA estate already ships a relevant Joule Agent or Skill at the Base tier — e.g. expense report drafting, e-invoicing error translation — there's no case for building a parallel n8n workflow to replicate it. Recommend n8n where it adds reach Joule doesn't have (cross-platform, custom ML/CV, self-hosted control), not where it duplicates something SAP already gives the client for nothing.</p>
+    </div>
+    <div class="divider"></div>
+    <div class="callout callout-red">
+      <div class="mark">⊘</div>
+      <p><strong>The non-negotiable:</strong> we do not put an unmanaged, internet-exposed n8n instance anywhere near a workflow that posts documents into a client's SAP system. Given six maximum-severity CVEs in one quarter and 24,700 still-unpatched instances found in the wild, that single setup choice is the one place "cheap and fast" becomes "reckless." Everything else on this deck is negotiable scope. That isn't.</p>
+    </div>
+    <div class="callout callout-green" style="margin-top:1rem;">
+      <div class="mark">↻</div>
+      <p><strong>Worth flagging to the client directly:</strong> SAP's own Q3 2026 GA of n8n inside Joule Studio may make this entire hosting debate moot within two quarters. If their timeline allows it, building Tier 2 workflows in a way that's portable to that environment is worth the small extra discipline now.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 13 — CLOSING -->
+<section class="slide" id="s13">
+  <div class="slide-inner">
+    <div class="eyebrow"><span class="num">13</span> Where this leaves the deal</div>
+    <h2 class="slide-title">Can we close this?</h2>
+    <p class="lede">Short answer: yes — if we present the risk register as confidence, not as caution. Clients pay more for the team that names the landmines unprompted than the one that promises everything will be fine.</p>
+    <div class="grid grid-2">
+      <div>
+        <h4 style="margin-bottom:.6rem;">What makes this a strong pitch</h4>
+        <ul class="plain">
+          <li>SAP's own $5.2B bet on n8n removes the "is this a toy tool" objection before it's raised.</li>
+          <li>We can scope the engagement in tiers, so the client isn't buying one all-or-nothing platform decision.</li>
+          <li>We have a concrete, defensible hosting recommendation instead of a vague "it depends."</li>
+        </ul>
+      </div>
+      <div>
+        <h4 style="margin-bottom:.6rem;">What we should ask the client before pricing</h4>
+        <ul class="plain">
+          <li>S/4HANA edition and hosting model (public cloud vs. on-prem/private) — this alone decides if RFC is even on the table.</li>
+          <li>Roughly how many documents/month the target processes would touch, for the Digital Access conversation.</li>
+          <li>Whether they already hold SAP BTP credits — it changes Tier 2 and Tier 3 economics materially.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="slide" style="min-height:auto;">
+  <div class="slide-inner">
+    <p class="bigword" style="margin-bottom:1rem;">Sources consulted</p>
+    <p class="sources">
+      n8n Blog — SAP partnership announcement, May 2026 · erp.today — "SAP Moves Agent Orchestration into Joule Studio with n8n Deal" · PYMNTS — SAP/n8n investment coverage, May 2026 · news.sap.com — "Announcing New Joule Studio for Enterprise Scale Agentic Development," Sapphire 2026 keynote coverage, Q1 2026 Business AI release highlights · sap.com/products/artificial-intelligence — Joule Agents, Joule Assistants, AI pricing pages · discovery-center.cloud.sap — Joule Studio agent builder feature page · learning.sap.com — "Introducing Joule: Understanding the Commercial Model" · help.sap.com/docs/joule — metering and pricing · aimultiple.com — "SAP AI Agents in 2026: Joule Studio Features & Case Studies" · savictech.com — "SAP Joule Agentic AI 2026" and "Joule Studio 2.0" briefings · prolifics.com — "SAP Joule Agentic AI 2026" · completeaitraining.com — Sapphire 2026 Business AI Platform coverage · saplicensingexperts.com — Joule AI Unit pricing, RISE bundle and developer-licensing guides · atonementlicensing.com — Joule AI licensing/JCU pricing comparison · SAP Community — "Connecting SAP GenAI Hub to n8n" tutorial · CData — SAP HANA + n8n via Connect AI · NeKu.AI — n8n SAP Connector product page · Workato Docs — SAP RFC connector documentation · Make.com — SAP S/4HANA, SAP ECC Agent, SAP SuccessFactors integration pages · SAP Note 3255746 (ODP-RFC restriction guidance) · saplicensingexperts.com — SAP Indirect Access / Digital Access guides · redresscompliance.com — SAP Indirect Access rules & audit detail · i-flow.io — SAP interfaces (OData, IDoc, RFC/BAPI) overview · knowledgelib.io — SAP BAPI/RFC integration reference · The Hacker News, The Register, SecurityWeek, Rapid7, CyberPress, Aikido — n8n CVE coverage (Ni8mare, N8scape, CVE-2026-21858/21877, CVE-2025-68613/68668/68697) · n8n Blog — "Introducing n8n 2.0" · docs.n8n.io — release notes · n8nlab.io, instapods.com, openhosst.com, expresstech.io, n8nlogic.com, hosterocean.com, vps-server.host — n8n hosting & pricing comparisons · replacehumans.ai, uibakery.io, zapier.com, gartner.com, activepieces.com, intuitionlabs.ai, use-apify.com — automation platform comparisons · sap.com, artsyltech.com, rossum.ai, blog.duvo.ai, community.sap.com, developers.sap.com — SAP automation use cases and ROI benchmarks.
+    </p>
+    <p class="kicker" style="margin-top:1.5rem;">Prepared for internal discussion — not a client-facing document as-is. Figures sourced from vendor and industry publications current as of June 2026; verify pricing and CVE-patch status before quoting, since both move fast in this space.</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const dotnav = document.getElementById('dotnav');
+  const curnum = document.getElementById('curnum');
+  const progress = document.getElementById('progress');
+
+  slides.forEach((s,i)=>{
+    const a = document.createElement('a');
+    a.href = '#'+s.id;
+    if(i===0) a.classList.add('active');
+    dotnav.appendChild(a);
+  });
+  const dots = Array.from(dotnav.children);
+
+  function setActive(idx){
+    dots.forEach((d,i)=>d.classList.toggle('active', i===idx));
+    curnum.textContent = String(idx+1).padStart(2,'0');
+  }
+
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        const idx = slides.indexOf(e.target);
+        if(idx>-1) setActive(idx);
+      }
+    });
+  }, {threshold:0.5});
+  slides.forEach(s=>io.observe(s));
+
+  function updateProgress(){
+    const h = document.documentElement;
+    const scrolled = h.scrollTop / (h.scrollHeight - h.clientHeight) * 100;
+    progress.style.width = (isFinite(scrolled)?scrolled:0) + '%';
+  }
+  document.addEventListener('scroll', updateProgress, {passive:true});
+  updateProgress();
+
+  document.addEventListener('keydown', (e)=>{
+    const curIdx = slides.findIndex(s=>s.id === ('#'+location.hash ? location.hash.slice(1) : ''));
+    let idx = dots.findIndex(d=>d.classList.contains('active'));
+    if(e.key==='ArrowDown' || e.key==='PageDown'){ e.preventDefault(); idx = Math.min(idx+1, slides.length-1); slides[idx].scrollIntoView({behavior:'smooth'}); }
+    if(e.key==='ArrowUp' || e.key==='PageUp'){ e.preventDefault(); idx = Math.max(idx-1, 0); slides[idx].scrollIntoView({behavior:'smooth'}); }
+  });
+})();
+</script>
+</body>
+</html>
