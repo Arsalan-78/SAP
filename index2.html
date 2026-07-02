@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAP Invoice Agent • Professional Pitch Report</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=Space+Grotesk:wght@500;600&amp;display=swap');
+        
+        :root {
+            --primary: #0f172a;
+        }
+        
+        body {
+            font-family: 'Inter', system_ui, sans-serif;
+        }
+        
+        .font-display {
+            font-family: 'Space Grotesk', 'Inter', sans-serif;
+            font-weight: 600;
+        }
+
+        .section-header {
+            font-size: 2.25rem;
+            line-height: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+        }
+
+        .nav-active {
+            color: #0ea5e9;
+            font-weight: 600;
+        }
+
+        .card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+
+        .metric-value {
+            font-size: 2.25rem;
+            line-height: 2.5rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .tech-pill {
+            background: linear-gradient(145deg, #f8fafc, #f1e7ff);
+            border: 1px solid #e0e7ff;
+        }
+
+        .flow-arrow {
+            animation: flow 2s infinite ease-in-out;
+        }
+
+        .professional-shadow {
+            box-shadow: 0 10px 15px -3px rgb(15 23 42 / 0.1), 0 4px 6px -4px rgb(15 23 42 / 0.1);
+        }
+
+        .slide {
+            scroll-margin-top: 80px;
+        }
+
+        .mermaid {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+    <!-- Navbar -->
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-screen-2xl mx-auto">
+            <div class="px-8 py-5 flex items-center justify-between">
+                <div class="flex items-center gap-x-3">
+                    <div class="w-11 h-11 bg-slate-900 rounded-2xl flex items-center justify-center">
+                        <i class="fa-solid fa-robot text-white text-3xl"></i>
+                    </div>
+                    <div>
+                        <span class="font-display text-3xl font-semibold tracking-tighter">SAP Invoice Agent</span>
+                    </div>
+                </div>
+                
+                <div class="hidden md:flex items-center gap-x-8 text-sm font-medium">
+                    <a href="#overview" class="hover:text-sky-600 transition-colors">Overview</a>
+                    <a href="#architecture" class="hover:text-sky-600 transition-colors">Architecture</a>
+                    <a href="#components" class="hover:text-sky-600 transition-colors">Components</a>
+                    <a href="#workflow" class="hover:text-sky-600 transition-colors">Workflow</a>
+                    <a href="#benefits" class="hover:text-sky-600 transition-colors">Benefits</a>
+                </div>
+                
+                <div class="flex items-center gap-x-3">
+                    <button onclick="window.print()" 
+                            class="flex items-center gap-x-2 px-5 py-2.5 text-sm font-semibold bg-white border border-slate-300 hover:bg-slate-50 rounded-2xl transition-all">
+                        <i class="fa-solid fa-download mr-2"></i>
+                        <span>Export PDF</span>
+                    </button>
+                    <button onclick="document.getElementById('contact').scrollIntoView({ behavior: 'smooth' })" 
+                            class="flex items-center gap-x-2 px-6 py-2.5 text-sm font-semibold bg-slate-900 hover:bg-slate-800 text-white rounded-2xl transition-all">
+                        <span>Schedule Demo</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero / Title Slide -->
+    <div class="max-w-screen-2xl mx-auto px-8 pt-16 pb-12">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            <div class="lg:col-span-7">
+                <div class="inline-flex items-center gap-x-2 bg-emerald-100 text-emerald-700 text-sm font-semibold px-4 py-1.5 rounded-3xl mb-6">
+                    <i class="fa-solid fa-check-double"></i>
+                    <span>Ready for Production • Zero Infrastructure Cost</span>
+                </div>
+                
+                <h1 class="font-display text-6xl lg:text-7xl leading-none tracking-tighter font-semibold text-slate-900">
+                    SAP Invoice<br>Automation Agent
+                </h1>
+                <p class="mt-6 text-2xl text-slate-600 max-w-xl">
+                    AI-powered end-to-end invoice processing that connects n8n, FastAPI, LangGraph, and SAP in one intelligent workflow.
+                </p>
+                
+                <div class="mt-8 flex items-center gap-x-4">
+                    <button onclick="document.getElementById('overview').scrollIntoView({ behavior: 'smooth' })" 
+                            class="px-8 py-4 bg-sky-600 hover:bg-sky-700 transition-all text-white font-semibold rounded-3xl text-lg flex items-center gap-x-3">
+                        Explore the Solution
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                    <button onclick="document.getElementById('workflow').scrollIntoView({ behavior: 'smooth' })" 
+                            class="px-8 py-4 border border-slate-300 hover:bg-white font-semibold rounded-3xl text-lg flex items-center gap-x-3">
+                        <i class="fa-solid fa-play mr-2"></i>
+                        Watch Workflow
+                    </button>
+                </div>
+                
+                <div class="mt-8 flex items-center gap-x-8 text-sm">
+                    <div class="flex items-center gap-x-2">
+                        <div class="flex -space-x-2">
+                            <div class="w-7 h-7 bg-slate-200 rounded-full border border-white"></div>
+                            <div class="w-7 h-7 bg-emerald-200 rounded-full border border-white"></div>
+                            <div class="w-7 h-7 bg-sky-200 rounded-full border border-white"></div>
+                        </div>
+                        <span class="text-slate-500">Built for real SAP environments</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="lg:col-span-5">
+                <div class="bg-white rounded-3xl p-8 professional-shadow border border-slate-100">
+                    <div class="flex justify-between items-start mb-6">
+                        <div>
+                            <div class="text-sm text-slate-500">Prepared for</div>
+                            <div class="font-semibold text-xl">Client Pitch</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xs text-slate-500">July 2026</div>
+                            <div class="font-mono text-emerald-600 text-sm font-semibold">v1.0 • Production Ready</div>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-4 text-sm">
+                        <div class="flex justify-between py-2 border-b border-slate-100">
+                            <span class="text-slate-600">Total Cost (Demo)</span>
+                            <span class="font-semibold text-emerald-600">$0</span>
+                        </div>
+                        <div class="flex justify-between py-2 border-b border-slate-100">
+                            <span class="text-slate-600">Processing Time</span>
+                            <span class="font-semibold">&lt; 30 seconds</span>
+                        </div>
+                        <div class="flex justify-between py-2">
+                            <span class="text-slate-600">AI Model</span>
+                            <span class="font-semibold">Llama 3.3 70B (Groq)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Key Metrics -->
+    <div class="max-w-screen-2xl mx-auto px-8 pb-16">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-white rounded-3xl p-6 border border-slate-100">
+                <div class="text-emerald-600"><i class="fa-solid fa-bolt text-2xl"></i></div>
+                <div class="mt-4">
+                    <div class="metric-value">95%+</div>
+                    <div class="text-sm text-slate-600">Auto-approval rate on clean invoices</div>
+                </div>
+            </div>
+            <div class="bg-white rounded-3xl p-6 border border-slate-100">
+                <div class="text-emerald-600"><i class="fa-solid fa-clock text-2xl"></i></div>
+                <div class="mt-4">
+                    <div class="metric-value">80%</div>
+                    <div class="text-sm text-slate-600">Reduction in manual AP effort</div>
+                </div>
+            </div>
+            <div class="bg-white rounded-3xl p-6 border border-slate-100">
+                <div class="text-emerald-600"><i class="fa-solid fa-robot text-2xl"></i></div>
+                <div class="mt-4">
+                    <div class="metric-value">3-Way</div>
+                    <div class="text-sm text-slate-600">Intelligent PO matching</div>
+                </div>
+            </div>
+            <div class="bg-white rounded-3xl p-6 border border-slate-100">
+                <div class="text-emerald-600"><i class="fa-solid fa-globe text-2xl"></i></div>
+                <div class="mt-4">
+                    <div class="metric-value">0</div>
+                    <div class="text-sm text-slate-600">Infrastructure cost for demo</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Executive Summary -->
+    <div id="overview" class="max-w-screen-2xl mx-auto px-8 py-12 slide">
+        <div class="max-w-4xl">
+            <div class="uppercase tracking-[3px] text-xs font-semibold text-sky-600 mb-3">EXECUTIVE SUMMARY</div>
+            <h2 class="section-header">Intelligent Invoice Processing<br>for Modern SAP Environments</h2>
+        </div>
+        
+        <div class="mt-8 grid grid-cols-1 lg:grid-cols-5 gap-8">
+            <div class="lg:col-span-3 text-lg text-slate-600 leading-relaxed">
+                The <strong>SAP Invoice Agent</strong> is a production-ready, end-to-end automation solution that transforms manual Accounts Payable workflows into an intelligent, AI-driven process.
+                <br><br>
+                It seamlessly integrates <strong>n8n orchestration</strong>, <strong>FastAPI backend</strong>, <strong>LangGraph-powered decision agent</strong> (using Groq’s Llama 3.3 70B), and direct <strong>SAP OData connectivity</strong> to deliver accurate, explainable, and fully auditable invoice processing.
+            </div>
+            <div class="lg:col-span-2 bg-white rounded-3xl p-8 border border-slate-100">
+                <div class="font-semibold mb-4">Core Value Delivered</div>
+                <ul class="space-y-3 text-sm">
+                    <li class="flex gap-x-3"><i class="fa-solid fa-check text-emerald-500 mt-1"></i> <span>Automatic 3-way matching with SAP Purchase Orders</span></li>
+                    <li class="flex gap-x-3"><i class="fa-solid fa-check text-emerald-500 mt-1"></i> <span>AI-generated plain-English explanations for mismatches</span></li>
+                    <li class="flex gap-x-3"><i class="fa-solid fa-check text-emerald-500 mt-1"></i> <span>Instant auto-posting to SAP for clean invoices</span></li>
+                    <li class="flex gap-x-3"><i class="fa-solid fa-check text-emerald-500 mt-1"></i> <span>Smart escalation to human review when needed</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Architecture -->
+    <div id="architecture" class="max-w-screen-2xl mx-auto px-8 py-12 bg-white border-y border-slate-200 slide">
+        <div class="max-w-screen-2xl">
+            <div class="flex items-end justify-between mb-8">
+                <div>
+                    <div class="uppercase tracking-[3px] text-xs font-semibold text-sky-600">SYSTEM ARCHITECTURE</div>
+                    <h2 class="section-header mt-1">Clean, Scalable &amp; Production-Ready</h2>
+                </div>
+            </div>
+
+            <!-- Mermaid Architecture Diagram -->
+            <div class="bg-slate-900 rounded-3xl p-8 mb-8">
+                <div class="text-white text-sm mb-4 flex items-center gap-x-2">
+                    <i class="fa-solid fa-project-diagram"></i>
+                    <span class="font-semibold">End-to-End Pipeline</span>
+                </div>
+                <div class="mermaid">
+                    flowchart LR
+                        A["n8n Workflow<br/>(Hostinger)"] -->|Webhook| B["FastAPI<br/>app/main.py"]
+                        B --> C["OCR Extractor<br/>app/ocr_extractor.py"]
+                        C --> D["LangGraph Agent<br/>app/agent.py"]
+                        D --> E["SAP Connector<br/>app/sap_connector.py"]
+                        E -->|OData| F["SAP System<br/>(Trial / Production)"]
+                        
+                        style A fill:#0ea5e9,stroke:#fff,color:#fff
+                        style B fill:#64748b,stroke:#fff,color:#fff
+                        style C fill:#64748b,stroke:#fff,color:#fff
+                        style D fill:#0f766e,stroke:#fff,color:#fff
+                        style E fill:#64748b,stroke:#fff,color:#fff
+                        style F fill:#1e40af,stroke:#fff,color:#fff
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-slate-50 rounded-3xl p-6">
+                    <div class="font-semibold flex items-center gap-x-2"><i class="fa-solid fa-cloud text-sky-600"></i> <span>Orchestration Layer</span></div>
+                    <p class="mt-3 text-sm text-slate-600">n8n handles triggers (email/webhook), routing, and notifications with zero code.</p>
+                </div>
+                <div class="bg-slate-50 rounded-3xl p-6">
+                    <div class="font-semibold flex items-center gap-x-2"><i class="fa-solid fa-brain text-emerald-600"></i> <span>Intelligence Layer</span></div>
+                    <p class="mt-3 text-sm text-slate-600">LangGraph state machine + Groq Llama 3.3 70B for smart decision making and explanations.</p>
+                </div>
+                <div class="bg-slate-50 rounded-3xl p-6">
+                    <div class="font-semibold flex items-center gap-x-2"><i class="fa-solid fa-plug text-indigo-600"></i> <span>Integration Layer</span></div>
+                    <p class="mt-3 text-sm text-slate-600">Direct SAP OData connectivity with full mock mode for rapid demos and testing.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Key Components -->
+    <div id="components" class="max-w-screen-2xl mx-auto px-8 py-16 slide">
+        <div class="mb-10">
+            <div class="uppercase tracking-[3px] text-xs font-semibold text-sky-600">CORE COMPONENTS</div>
+            <h2 class="section-header">Built with Production-Grade Technologies</h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Component Cards -->
+            <div class="card bg-white border border-slate-200 rounded-3xl p-7">
+                <div class="flex items-center gap-x-4 mb-5">
+                    <div class="w-12 h-12 bg-sky-100 text-sky-600 rounded-2xl flex items-center justify-center">
+                        <i class="fa-solid fa-server text-3xl"></i>
+                    </div>
+                    <div>
+                        <div class="font-semibold text-xl">FastAPI Backend</div>
+                        <div class="text-xs text-sky-600 font-medium">app/main.py</div>
+                    </div>
+                </div>
+                <p class="text-sm text-slate-600">High-performance API server that receives invoice uploads from n8n, orchestrates the full pipeline, and returns structured decisions.</p>
+                <div class="mt-5 text-xs bg-slate-100 px-3 py-1 rounded-xl inline-block">Endpoints: <code class="font-mono">/process-invoice</code></div>
+            </div>
+
+            <div class="card bg-white border border-slate-200 rounded-3xl p-7">
+                <div class="flex items-center gap-x-4 mb-5">
+                    <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center">
+                        <i class="fa-solid fa-brain text-3xl"></i>
+                    </div>
+                    <div>
+                        <div class="font-semibold text-xl">LangGraph AI Agent</div>
+                        <div class="text-xs text-emerald-600 font-medium">app/agent.py</div>
+                    </div>
+                </div>
+                <p class="text-sm text-slate-600">Stateful decision engine using LangGraph. Performs 3-way matching, auto-approves clean invoices, and generates human-readable explanations for mismatches.</p>
+                <div class="mt-4 flex flex-wrap gap-2">
+                    <span class="text-xs px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full">match_po</span>
+                    <span class="text-xs px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full">approve</span>
+                    <span class="text-xs px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full">explain_mismatch</span>
+                </div>
+            </div>
+
+            <div class="card bg-white border border-slate-200 rounded-3xl p-7">
+                <div class="flex items-center gap-x-4 mb-5">
+                    <div class="w-12 h-12 bg-violet-100 text-violet-600 rounded-2xl flex items-center justify-center">
+                        <i class="fa-solid fa-file-lines text-3xl"></i>
+                    </div>
+                    <div>
+                        <div class="font-semibold text-xl">OCR &amp; Field Extractor</div>
+                        <div class="text-xs text-violet-600 font-medium">app/ocr_extractor.py</div>
+                    </div>
+                </div>
+                <p class="text-sm text-slate-600">Uses Tesseract + pdf2image to extract text from PDFs and regex-based parsing to pull invoice number, PO number, vendor, and total amount.</p>
+            </div>
+
+            <div class="card bg-white border border-slate-200 rounded-3xl p-7">
+                <div class="flex items-center gap-x-4 mb-5">
+                    <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center">
+                        <i class="fa-solid fa-plug text-3xl"></i>
+                    </div>
+                    <div>
+                        <div class="font-semibold text-xl">SAP Connector</div>
+                        <div class="text-xs text-indigo-600 font-medium">app/sap_connector.py</div>
+                    </div>
+                </div>
+                <p class="text-sm text-slate-600">Full OData integration with <strong>API_PURCHASEORDER_PROCESS_SRV</strong> and invoice posting. Includes powerful mock mode with realistic sample POs for instant demos.</p>
+                <div class="mt-4 text-xs">
+                    <span class="font-mono bg-indigo-50 px-2 py-0.5 rounded">MOCK_MODE = True</span> by default
+                </div>
+            </div>
+
+            <div class="card bg-white border border-slate-200 rounded-3xl p-7">
+                <div class="flex items-center gap-x-4 mb-5">
+                    <div class="w-12 h-12 bg-orange-100 text-orange-600 rounded-2xl flex items-center justify-center">
+                        <i class="fa-solid fa-project-diagram text-3xl"></i>
+                    </div>
+                    <div>
+                        <div class="font-semibold text-xl">n8n Orchestration</div>
+                        <div class="text-xs text-orange-600 font-medium">n8n/invoice-workflow.json</div>
+                    </div>
+                </div>
+                <p class="text-sm text-slate-600">Ready-to-import workflow that handles webhook triggers, calls the FastAPI service, routes based on AI decisions, and sends professional email notifications.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Workflow -->
+    <div id="workflow" class="max-w-screen-2xl mx-auto px-8 py-16 bg-white slide">
+        <div class="max-w-4xl mx-auto text-center mb-12">
+            <div class="uppercase tracking-[3px] text-xs font-semibold text-sky-600">INTELLIGENT WORKFLOW</div>
+            <h2 class="section-header mt-2">How the Agent Processes an Invoice</h2>
+        </div>
+
+        <div class="max-w-5xl mx-auto">
+            <div class="space-y-6">
+                <!-- Step 1 -->
+                <div class="flex gap-x-6">
+                    <div class="flex-shrink-0 w-9 h-9 bg-sky-600 text-white rounded-2xl flex items-center justify-center font-bold">1</div>
+                    <div class="flex-1">
+                        <div class="font-semibold">Invoice Received</div>
+                        <div class="text-sm text-slate-600">n8n webhook receives PDF (or email trigger). File is forwarded to FastAPI.</div>
+                    </div>
+                </div>
+                
+                <!-- Step 2 -->
+                <div class="flex gap-x-6">
+                    <div class="flex-shrink-0 w-9 h-9 bg-sky-600 text-white rounded-2xl flex items-center justify-center font-bold">2</div>
+                    <div class="flex-1">
+                        <div class="font-semibold">OCR &amp; Data Extraction</div>
+                        <div class="text-sm text-slate-600">Tesseract OCR extracts text → Structured fields parsed (Invoice #, PO #, Vendor, Amount).</div>
+                    </div>
+                </div>
+                
+                <!-- Step 3 -->
+                <div class="flex gap-x-6">
+                    <div class="flex-shrink-0 w-9 h-9 bg-emerald-600 text-white rounded-2xl flex items-center justify-center font-bold">3</div>
+                    <div class="flex-1">
+                        <div class="font-semibold">LangGraph Decision Engine</div>
+                        <div class="text-sm text-slate-600">Agent fetches PO from SAP and performs intelligent 3-way matching. Routes to auto-approve, explain mismatch, or escalate.</div>
+                    </div>
+                </div>
+                
+                <!-- Step 4 -->
+                <div class="flex gap-x-6">
+                    <div class="flex-shrink-0 w-9 h-9 bg-emerald-600 text-white rounded-2xl flex items-center justify-center font-bold">4</div>
+                    <div class="flex-1">
+                        <div class="font-semibold">SAP Action + Notification</div>
+                        <div class="text-sm text-slate-600">Clean invoices are posted automatically. Mismatches receive AI-generated explanations and are routed for human review via email.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Benefits -->
+    <div id="benefits" class="max-w-screen-2xl mx-auto px-8 py-16 slide">
+        <div class="mb-10">
+            <div class="uppercase tracking-[3px] text-xs font-semibold text-sky-600">BUSINESS IMPACT</div>
+            <h2 class="section-header">Measurable Results from Day One</h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-white border border-slate-200 rounded-3xl p-8">
+                <h3 class="font-semibold text-2xl mb-6">Operational Benefits</h3>
+                <ul class="space-y-4">
+                    <li class="flex gap-x-4"><i class="fa-solid fa-check-circle text-emerald-500 text-xl mt-0.5"></i> <span class="text-slate-700">Dramatically reduce manual data entry and verification time</span></li>
+                    <li class="flex gap-x-4"><i class="fa-solid fa-check-circle text-emerald-500 text-xl mt-0.5"></i> <span class="text-slate-700">Eliminate human errors in PO matching</span></li>
+                    <li class="flex gap-x-4"><i class="fa-solid fa-check-circle text-emerald-500 text-xl mt-0.5"></i> <span class="text-slate-700">Instant visibility with AI-generated audit trails and explanations</span></li>
+                    <li class="flex gap-x-4"><i class="fa-solid fa-check-circle text-emerald-500 text-xl mt-0.5"></i> <span class="text-slate-700">Faster payment cycles and improved vendor relationships</span></li>
+                </ul>
+            </div>
+            
+            <div class="bg-white border border-slate-200 rounded-3xl p-8">
+                <h3 class="font-semibold text-2xl mb-6">Technical &amp; Cost Advantages</h3>
+                <div class="space-y-5">
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="font-medium">Demo / POC Cost</span>
+                            <span class="font-bold text-emerald-600">$0</span>
+                        </div>
+                        <div class="h-2 bg-emerald-100 rounded-full overflow-hidden"><div class="h-2 w-full bg-emerald-500 rounded-full"></div></div>
+                    </div>
+                    <div class="text-sm text-slate-600">• Free Groq LLM tier<br>• Free SAP BTP trial<br>• Free open-source stack (FastAPI, LangGraph, Tesseract)</div>
+                    
+                    <div class="pt-4 border-t">
+                        <div class="font-medium mb-1">Production Ready</div>
+                        <div class="text-sm text-slate-600">Switch from mock mode to real SAP OData in minutes. Fully containerizable and scalable.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tech Stack -->
+    <div class="max-w-screen-2xl mx-auto px-8 py-12">
+        <div class="text-center mb-8">
+            <div class="uppercase tracking-[3px] text-xs font-semibold text-sky-600">TECHNOLOGY STACK</div>
+        </div>
+        <div class="flex flex-wrap justify-center gap-3">
+            <div class="tech-pill px-5 py-2.5 rounded-3xl text-sm font-medium flex items-center gap-x-2"><i class="fa-brands fa-python"></i> <span>FastAPI + Uvicorn</span></div>
+            <div class="tech-pill px-5 py-2.5 rounded-3xl text-sm font-medium flex items-center gap-x-2"><i class="fa-solid fa-project-diagram"></i> <span>LangGraph + LangChain</span></div>
+            <div class="tech-pill px-5 py-2.5 rounded-3xl text-sm font-medium flex items-center gap-x-2"><i class="fa-solid fa-robot"></i> <span>Groq (Llama 3.3 70B)</span></div>
+            <div class="tech-pill px-5 py-2.5 rounded-3xl text-sm font-medium flex items-center gap-x-2"><i class="fa-solid fa-file-pdf"></i> <span>Tesseract OCR + pdf2image</span></div>
+            <div class="tech-pill px-5 py-2.5 rounded-3xl text-sm font-medium flex items-center gap-x-2"><i class="fa-solid fa-plug"></i> <span>SAP OData</span></div>
+            <div class="tech-pill px-5 py-2.5 rounded-3xl text-sm font-medium flex items-center gap-x-2"><i class="fa-solid fa-sync"></i> <span>n8n</span></div>
+        </div>
+    </div>
+
+    <!-- Next Steps -->
+    <div class="max-w-screen-2xl mx-auto px-8 py-16 bg-slate-900 text-white rounded-3xl mx-8 mb-12">
+        <div class="max-w-3xl">
+            <div class="text-sky-400 text-sm font-semibold tracking-widest">NEXT STEPS</div>
+            <h2 class="text-4xl font-semibold tracking-tight mt-3">Ready to Transform Your AP Process?</h2>
+            
+            <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
+                <div>
+                    <div class="font-semibold mb-2">1. Live Demo</div>
+                    <p class="text-slate-300">We can run a full end-to-end demo using the mock SAP environment in under 15 minutes.</p>
+                </div>
+                <div>
+                    <div class="font-semibold mb-2">2. Pilot Deployment</div>
+                    <p class="text-slate-300">Deploy on your infrastructure with your own SAP trial or production system.</p>
+                </div>
+                <div>
+                    <div class="font-semibold mb-2">3. Customization</div>
+                    <p class="text-slate-300">Tailor matching rules, approval thresholds, and notification templates to your exact process.</p>
+                </div>
+            </div>
+            
+            <div id="contact" class="mt-10 pt-8 border-t border-slate-700">
+                <button onclick="window.location.href='mailto:your-email@example.com?subject=SAP%20Invoice%20Agent%20Demo%20Request'" 
+                        class="inline-flex items-center gap-x-3 bg-white text-slate-900 hover:bg-slate-100 transition-all px-8 py-4 rounded-3xl font-semibold text-lg">
+                    <span>Request a Live Demo</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+                <p class="text-xs text-slate-400 mt-3">We typically respond within 2 business hours.</p>
+            </div>
+        </div>
+    </div>
+
+    <footer class="max-w-screen-2xl mx-auto px-8 pb-8 text-center text-xs text-slate-500">
+        <p>SAP Invoice Agent • Built with ❤️ for modern finance teams • July 2026</p>
+    </footer>
+
+    <script>
+        // Tailwind script
+        function initializeTailwind() {
+            document.documentElement.style.setProperty('--accent', '#0ea5e9');
+        }
+        
+        // Initialize Mermaid
+        function initializeMermaid() {
+            mermaid.initialize({
+                startOnLoad: true,
+                theme: 'base',
+                themeVariables: {
+                    primaryColor: '#0ea5e9',
+                    primaryTextColor: '#fff',
+                    primaryBorderColor: '#0ea5e9',
+                    lineColor: '#64748b',
+                    secondaryColor: '#64748b',
+                    tertiaryColor: '#0f766e'
+                },
+                flowchart: {
+                    curve: 'basis'
+                }
+            });
+        }
+        
+        // Smooth scroll for nav links
+        function setupSmoothScroll() {
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+            });
+        }
+        
+        // Keyboard support for print
+        function setupKeyboardShortcuts() {
+            document.addEventListener('keydown', function(e) {
+                if (e.metaKey && e.key === "p") {
+                    e.preventDefault();
+                    window.print();
+                }
+            });
+        }
+        
+        // Initialize everything
+        function init() {
+            initializeTailwind();
+            initializeMermaid();
+            setupSmoothScroll();
+            setupKeyboardShortcuts();
+            
+            // Optional: Add subtle animation to cards on scroll
+            const cards = document.querySelectorAll('.card');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            cards.forEach(card => {
+                card.style.opacity = '0.95';
+                observer.observe(card);
+            });
+            
+            console.log('%c[SAP Invoice Agent] Professional HTML Pitch Report initialized successfully.', 'color:#64748b');
+        }
+        
+        window.onload = init;
+    </script>
+</body>
+</html>
